@@ -73,6 +73,7 @@ class Parameters:
     tAL = Symbol("tAL")
     tRTRS = Symbol("tRTRS")
     tRP = Symbol("tRP")
+    tRPA = Symbol("tRPA")
     tRRD = Symbol("tRRD")
     tWR = Symbol("tWR")
     tPD = Symbol("tPD")
@@ -241,6 +242,8 @@ def command_timing_constraints(p: Parameters) -> list[CommandTimingConstraint]:
         CommandTimingConstraint(intra_rank, [RD, RDA], [PDE, PDE], tRDPDEN),
         # Read -> Read (p33) 
         CommandTimingConstraint(intra_rank, [RD, RDA], [RD, RDA], p.tCCD),
+        # Only a READ without auto precharge can be interrupted (Table 42, Fig. 49)
+        CommandTimingConstraint(intra_rank, [RDA], [RD, RDA], tBURST),
         # Read-> Write: (p36, Fig.35)
         CommandTimingConstraint(intra_rank, [RD, RDA], [WR, WRA,], tRTW),
         # Also not explicitly found, but makes sense
@@ -251,6 +254,8 @@ def command_timing_constraints(p: Parameters) -> list[CommandTimingConstraint]:
         
         # Write -> RD, WR
         CommandTimingConstraint(intra_rank, [WR], [WR, WRA], p.tCCD),
+        # Only a WRITE without auto precharge can be interrupted (Table 43, Fig. 61)
+        CommandTimingConstraint(intra_rank, [WRA], [WR, WRA], tBURST),
         CommandTimingConstraint(intra_rank, [WR, WRA,], [RD, RDA], tWRRD),
         # Write -> Power down
         CommandTimingConstraint(intra_rank, [WR], [PDE], tWRPDEN),
@@ -270,7 +275,8 @@ def command_timing_constraints(p: Parameters) -> list[CommandTimingConstraint]:
         CommandTimingConstraint(intra_rank, [PRE], [SRE], p.tRP),
         CommandTimingConstraint(intra_rank, [PRE], [REF], p.tRP),
         
-        CommandTimingConstraint(intra_rank, [PREA], [ACT, REF, SRE], p.tRP),
+        # tRPA, not tRP, after PRECHARGE ALL (datasheet note 36)
+        CommandTimingConstraint(intra_rank, [PREA], [ACT, REF, SRE], p.tRPA),
         # (p55, Fig.69)
         CommandTimingConstraint(intra_rank, [PREA], [PDE], p.tCK),
         CommandTimingConstraint(intra_rank, [PRE], [PDE, PDE], p.tCK),

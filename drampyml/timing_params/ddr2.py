@@ -15,6 +15,7 @@ DDR2 = {
     "tRFC": 51,  # 127.5 ns (1Gb)
     "tRL": 5,  # AL + CL
     "tRP": 5,  # 12.5 ns
+    "tRPA": 6,  # tRP + tCK = 15 ns (8-bank devices, note 36)
     "tRRD": 4,  # 10 ns (x16; x4/x8 is 7.5 ns = 3)
     "tRTP": 3,  # 7.5 ns
     "tFAW": 18,  # 45 ns (x16; x4/x8 is 35 ns = 14)
